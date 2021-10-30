@@ -56,8 +56,3 @@ class PdfScanner():
                 if len(transaction) == 3:
                     transaction.append('other')
         return data
-
-a = PdfScanner(r'/home/kieran/statements/')
-
-for i in a.get_raw_transactions():
-    print(i)
