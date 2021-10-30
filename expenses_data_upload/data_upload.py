@@ -4,8 +4,7 @@ from typing import List
 
 import pdfplumber
 
-from helpers.mappings import category_conversion, month_conversion
-
+from expenses_data_upload.helpers.mappings import category_conversion, month_conversion
 
 class PdfScanner():
     """Class Docstring"""
