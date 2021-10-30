@@ -1,0 +1,8 @@
+# Python egg package info
+**.egg-info
+
+# Visual Studio settings
+.vscode
+
+# caches
+**__pycache__
