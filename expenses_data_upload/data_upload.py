@@ -42,15 +42,21 @@ class PdfScanner():
 
     def __format_transactional_data(self, data: List):
         """Function Docstring"""
-        for i, transaction in enumerate(data):
+        rows_to_delete = []
+        for idx, transaction in enumerate(data):
             transaction[1] = transaction[1].rstrip()
             transaction[2] = float(transaction[2].replace('£', ''))
 
             month = transaction[0][-3:]
-            data[i][0] = transaction[0].replace(
+            data[idx][0] = transaction[0].replace(
                 month, f'-{month_conversion[month]}-2021')
-
             transaction[0] = datetime.strptime(transaction[0], "%d-%m-%Y")
+            if transaction[1].endswith('-£') | transaction[1].endswith('-'):
+                rows_to_delete.append(idx)
+
+        for row in rows_to_delete:
+            del data[row]
+
         return data
 
     def __categorise_purchases(self, data: List):
