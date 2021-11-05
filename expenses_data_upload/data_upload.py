@@ -36,6 +36,7 @@ class PdfScanner():
                         transactions.pop(idx)
                     raw_transactions.append(
                         [transaction[:5], transaction[21:-6], transaction[transaction.rfind('£'):]])
+            print(f"Collected data from {file}")
 
         formated_data = self.__format_transactional_data(raw_transactions)
         return self.__categorise_purchases(formated_data)
@@ -54,7 +55,9 @@ class PdfScanner():
             if transaction[1].endswith('-£') | transaction[1].endswith('-'):
                 rows_to_delete.append(idx)
 
-        for row in rows_to_delete:
+        for position, row in enumerate(rows_to_delete):
+            if position > 0:
+                del data[row - 1]
             del data[row]
 
         return data
@@ -92,3 +95,5 @@ class PdfScanner():
                     """
 
                 connection.execute(sql)
+
+        print('Data has been successfully uploaded to MySQL')
