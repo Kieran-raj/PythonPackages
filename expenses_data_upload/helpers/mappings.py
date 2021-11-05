@@ -24,9 +24,12 @@ category_conversion = {
     'justeat': 'food',
     'deliveroo': 'food',
     'tfl': 'transport',
+    'train': 'transport',
     'burger': 'food',
     'franco': 'food',
     'crownandshuttle': 'social',
     'tank&paddle': 'social',
-    'tesco': 'food'
+    'tesco': 'food',
+    'boxpark': 'food',
+    'waitrose': 'food'
 }

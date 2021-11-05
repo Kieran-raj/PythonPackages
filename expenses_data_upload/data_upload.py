@@ -28,12 +28,10 @@ class PdfScanner():
                 for page in pages:
                     raw_text += page.extract_text()
                 split_raw_text = raw_text.split('\n')
-                transactions = split_raw_text[7:len(split_raw_text)-6]
+                transactions = split_raw_text[7:len(split_raw_text)-7]
                 # not good to hard code this come up with better way
                 del transactions[39:46]
-                for idx, transaction in enumerate(transactions):
-                    if '-£' in transaction:
-                        transactions.pop(idx)
+                for _, transaction in enumerate(transactions):
                     raw_transactions.append(
                         [transaction[:5], transaction[21:-6], transaction[transaction.rfind('£'):]])
             print(f"Collected data from {file}")
@@ -43,34 +41,35 @@ class PdfScanner():
 
     def __format_transactional_data(self, data: List):
         """Function Docstring"""
-        rows_to_delete = []
-        for idx, transaction in enumerate(data):
+        without_payments = [
+            transaction for transaction in data if "FASTERPAYMENT" not in transaction[1]]
+
+        without_balance = [
+            transaction for transaction in without_payments if "Bal" not in transaction[0]]
+
+        for idx, transaction in enumerate(without_balance):
             transaction[1] = transaction[1].rstrip()
-            transaction[2] = float(transaction[2].replace('£', ''))
+            transaction[2] = float(
+                transaction[2].replace('£', '').replace(',', ''))
 
             month = transaction[0][-3:]
-            data[idx][0] = transaction[0].replace(
-                month, f'-{month_conversion[month]}-2021')
+            without_balance[idx][0] = transaction[0].replace(
+                month, f'-{month_conversion.get(month)}-2021')
             transaction[0] = datetime.strptime(transaction[0], "%d-%m-%Y")
-            if transaction[1].endswith('-£') | transaction[1].endswith('-'):
-                rows_to_delete.append(idx)
 
-        for position, row in enumerate(rows_to_delete):
-            if position > 0:
-                del data[row - 1]
-            del data[row]
+        final_data = without_balance
 
-        return data
+        return final_data
 
     def __categorise_purchases(self, data: List):
         """Function Docstring"""
         for transaction in data:
-            for k, v in category_conversion.items():
+            for k, _ in category_conversion.items():
                 if k in transaction[1].lower():
                     transaction.append(category_conversion[k])
                     break
-                if len(transaction) == 3:
-                    transaction.append('other')
+            if len(transaction) == 3:
+                transaction.append('other')
         return data
 
     def upload_to_mysql(self, data: List):
