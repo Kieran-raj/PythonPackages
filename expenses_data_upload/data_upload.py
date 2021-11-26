@@ -1,6 +1,6 @@
 """Module to upload pdf statements"""
 import os
-from typing import Dict, List
+from typing import Dict, List, Type
 from datetime import datetime
 
 import pdfplumber
@@ -23,10 +23,16 @@ class PdfScanner():
         for file in os.listdir(self.file_location):
             full_path = self.file_location + file
             with pdfplumber.open(full_path) as pdf:
-                pages = pdf.pages[2:]
-                raw_text = ''
-                for page in pages:
-                    raw_text += page.extract_text()
+                try:
+                    pages = pdf.pages[2:-1]
+                    raw_text = ''
+                    for page in pages:
+                        raw_text += page.extract_text()
+                except TypeError:
+                    pages = pdf.pages[2:-1]
+                    raw_text = ''
+                    for page in pages:
+                        raw_text += page.extract_text()
                 split_raw_text = raw_text.split('\n')
                 transactions = split_raw_text[7:len(split_raw_text)-7]
                 # not good to hard code this come up with better way
