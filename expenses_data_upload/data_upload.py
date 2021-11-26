@@ -1,12 +1,14 @@
 """Module to upload pdf statements"""
 import os
-from typing import Dict, List, Type
+from typing import Dict, List
 from datetime import datetime
 
 import pdfplumber
 import sqlalchemy as db
 
 from expenses_data_upload.helpers.mappings import category_conversion, month_conversion
+
+# TODO: Take into account when amount is greater than £999
 
 
 class PdfScanner():
