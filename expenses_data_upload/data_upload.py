@@ -14,10 +14,11 @@ from expenses_data_upload.helpers.mappings import category_conversion, month_con
 class PdfScanner():
     """Class Docstring"""
 
-    def __init__(self, file_location: str, sql_settings: Dict = None, is_mysql: bool = True,):
+    def __init__(self, file_location: str, sql_settings: Dict = None, is_mysql: bool = True, sql_conn_str: str = ''):
         self.file_location = file_location
         self.sql_settings = sql_settings
         self.is_mysql = is_mysql
+        self.sql_conn_str = sql_conn_str
 
     def get_raw_transactions(self):
         """Function Docstring"""
@@ -100,7 +101,20 @@ class PdfScanner():
                     (date, description, category, amount) 
                     VALUES ('{transaction[0]}', '{transaction[1]}', '{transaction[3]}', '{transaction[2]}');
                     """
-
                 connection.execute(sql)
+            connection.close()
 
-        print('Data has been successfully uploaded to MySQL')
+            print('Data has been successfully uploaded to MySQL')
+        else:
+            engine = db.create_engine(self.sql_conn_str)
+            connection = engine.connect()
+            for _, transaction in enumerate(data):
+                sql = f"""
+                    INSERT INTO expenses 
+                    (date, description, category, amount) 
+                    VALUES ('{transaction[0]}', '{transaction[1]}', '{transaction[3]}', '{transaction[2]}');
+                    """
+                connection.execute(sql)
+            connection.close()
+
+            print('Data has been successfully uploaded to mocked SQLite database')
